@@ -2,7 +2,7 @@ DATA_DIR = "./data"
 BATCH_SIZE = 1  # stochastic
 NUM_WORKERS = 0
 
-LR_SCHEDULE = [  # total 20 passes
+LR_SCHEDULE = [  # (# of passes, lr) total 20 passes
     (2, 0.0005),
     (3, 0.0002),
     (3, 0.0001),
