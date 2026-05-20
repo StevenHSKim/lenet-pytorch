@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-import torch.nn.functional as F
+
 
 def scaled_tanh(x):
     """f(a) = 1.7159 * tanh (2/3 * a)"""
@@ -21,7 +21,6 @@ class SubsamplingLayer(nn.Module):
     def forward(self, x):
         x = self.pool(x) * 4  # AvgPool -> SumPool 
         x = self.weight * x + self.bias
-        x = scaled_tanh(x)
         return x
     
 
@@ -58,52 +57,43 @@ class C3PartialConv(nn.Module):
         # x: (B, 6, 14, 14)
         out = []
         for conv, col in zip(self.partial_conv_list, self.CONNECTION_TABLE):
-            selected_channels = x[:, col, :, :]
-            out.append(conv(selected_channels))
+            selected_fm = x[:, col, :, :]
+            out.append(conv(selected_fm))
         return torch.cat(out, dim=1)
 
 
 class EuclideanRadialBasisFunction(nn.Module):
-    """Output Layer (RBF): The parameter vectors of these units were chosen by hand and kept fixed at least initially"""
+    """Output Layer (RBF): The components of those parameters vectors were chosen at random with equal probabilities for -1 and +1 (fixed initially)"""
     
     def __init__(self, in_features=84, num_classes=10):
         super().__init__()
         # initialize weights
-        self.w = nn.Parameter(
-            torch.randn(num_classes, in_features),  # (10, 84)
-            requires_grad = False  # initially fixed
-        )
+        w = torch.randint(0, 2, (num_classes, in_features)).float() * 2 - 1  # -1, +1
+        self.w = nn.Parameter(w, requires_grad=False)  # fix
         
     def forward(self, x):
         x = (x.unsqueeze(1) - self.w).pow(2).sum(dim=2)  # x.unsqueeze(1) -> (B, 1, 84)
         return x
-        
     
     
 class LeNet(nn.Module):
+    """Input(32x32) -> C1 -> S2 -> C3 -> S4 -> C5 -> F6 -> Output(RBF)"""
+    
     def __init__(self):
-        super().__init__()
-        
-        # C1
-        self.c1 = nn.Conv2d(1, 6, kernel_size=5)
-        # S2
-        self.s2 = SubsamplingLayer(channels=6)
-        # C3
-        self.c3 = C3PartialConv()
-        # S4
-        self.s4 = SubsamplingLayer(channels=16)
-        # C5
-        self.c5 = nn.Conv2d(16, 120, kernel_size=5)
-        # F6
-        self.f6 = nn.Linear(120, 84)
-        # Output
-        self.output = EuclideanRadialBasisFunction(84, 10)
+        super().__init__()        
+        self.c1 = nn.Conv2d(1, 6, kernel_size=5)            # (B, 1, 32, 32) -> (B, 6, 28, 28)
+        self.s2 = SubsamplingLayer(channels=6)              # (B, 6, 28, 28) -> (B, 6, 14, 14)
+        self.c3 = C3PartialConv()                           # (B, 6, 14, 14) -> (B, 16, 10, 10)
+        self.s4 = SubsamplingLayer(channels=16)             # (B, 16, 10, 10) -> (B, 16, 5, 5)
+        self.c5 = nn.Conv2d(16, 120, kernel_size=5)         # (B, 16, 5, 5) -> (B, 120, 1, 1)
+        self.f6 = nn.Linear(120, 84)                        # (B, 120,) -> (B, 84)
+        self.output = EuclideanRadialBasisFunction(84, 10)  # (B, 84) -> (B, 10)
 
     def forward(self, x):
         x = scaled_tanh(self.c1(x))
-        x = self.s2(x)
+        x = scaled_tanh(self.s2(x))
         x = scaled_tanh(self.c3(x))
-        x = self.s4(x)
+        x = scaled_tanh(self.s4(x))
         x = scaled_tanh(self.c5(x))
         x = torch.flatten(x, start_dim=1)
         x = scaled_tanh(self.f6(x))
