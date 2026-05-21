@@ -1,14 +1,15 @@
 import matplotlib.pyplot as plt
 
 
-def plot_loss(train_losses: list, val_losses: list, save_path: str = None):
+def plot_loss(train_losses: list, val_losses: list = None, save_path: str = None):
     """Loss vs Epochs"""
     
     epochs = range(1, len(train_losses) + 1)
 
     plt.figure(figsize=(8, 5))
     plt.plot(epochs, train_losses, label="Train Loss")
-    plt.plot(epochs, val_losses,   label="Val Loss")
+    if val_losses:
+        plt.plot(epochs, val_losses, label="Val Loss")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.title("Loss vs Epochs")
