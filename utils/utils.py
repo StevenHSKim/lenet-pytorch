@@ -47,3 +47,19 @@ def compute_step_sizes(hessian_diag: dict, mu: float):
     """Equation (21)"""
     
     return {name: 1.0 / (mu + h) for name, h in hessian_diag.items()}
+
+
+def log_model_summary(model: nn.Module, logger):
+    logger.info("=" * 50)
+    logger.info("Model Summary")
+    logger.info("=" * 50)
+    
+    total = 0
+    for name, param in model.named_parameters():
+        n = param.numel()
+        total += n
+        logger.info(f"{name:<40}  {str(list(param.shape)):<25}  {n:>8,}")
+    
+    logger.info("=" * 50)
+    logger.info(f"{'Total Parameters':<40}  {'':<25}  {total:>8,}")
+    logger.info("=" * 50)

@@ -6,7 +6,7 @@ from configs.configs import *
 from data.data import get_dataloaders
 from lenet_pytorch.lenet_pytorch import LeNet
 from lenet_pytorch.loss import MAPLoss
-from utils.utils import init_weights, estimate_hessian, compute_step_sizes
+from utils.utils import init_weights, estimate_hessian, compute_step_sizes, log_model_summary
 from utils.logging import get_logger
 from utils.plot import plot_loss
 
@@ -22,6 +22,7 @@ def train():
     
     model = LeNet().to(device)
     init_weights(model)
+    log_model_summary(model, log)
     
     loss_function = MAPLoss(j=J)
     
