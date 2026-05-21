@@ -1,5 +1,6 @@
 import torch
 import os
+import datetime
 
 from configs.configs import *
 from data.data import get_dataloaders
@@ -11,6 +12,7 @@ from utils.plot import plot_loss
 
 os.makedirs("results", exist_ok=True)
 log = get_logger()
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
 def train():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -56,11 +58,11 @@ def train():
             train_losses.append(avg_loss)
             log.info(f"[Pass {current_pass}/{total_passes}] lr={lr:.5f}  loss={avg_loss:.4f}")
  
-    torch.save(model.state_dict(), "results/lenet5.pth")
-    log.info("Saved: results/lenet5.pth")
+    torch.save(model.state_dict(), f"results/lenet5_{timestamp}.pth")
+    log.info(f"Saved: results/lenet5_{timestamp}.pth")
  
-    plot_loss(train_losses, save_path="results/loss.png")
-    log.info("Saved: results/loss.png")
+    plot_loss(train_losses, save_path=f"results/loss_{timestamp}.png")
+    log.info(f"Saved: results/loss_{timestamp}.png")
                 
 if __name__ == "__main__":
     train()

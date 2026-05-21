@@ -1,5 +1,6 @@
 import torch
 import argparse
+import glob
 
 from configs.configs import DATA_DIR, BATCH_SIZE, NUM_WORKERS
 from data.data import get_dataloaders
@@ -36,7 +37,12 @@ def evaluate(weights_path: str = "lenet5.pth"):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--weights", type=str, default="results/lenet5.pth")
+    parser.add_argument("--weights", type=str, default=None)
     args = parser.parse_args()
+    
+    if args.weights is None:  
+        pth_files = sorted(glob.glob("results/*.pth"))
+        args.weights = pth_files[-1]  # choose recent file
+        print(f"Using: {args.weights}")
  
     evaluate(args.weights)

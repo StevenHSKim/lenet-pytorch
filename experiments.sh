@@ -7,7 +7,7 @@ echo "===== Training ====="
 python train.py
 
 echo "===== Evaluating ====="
-python evaluate.py --weights results/lenet5.pth
+python evaluate.py
 
 echo "===== Done ====="
 echo "Results saved in results/"
