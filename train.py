@@ -1,6 +1,6 @@
 import torch
 import os
-import datetime
+from datetime import datetime
 
 from configs.configs import *
 from data.data import get_dataloaders

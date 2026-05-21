@@ -14,7 +14,7 @@ def get_logger(log_dir: str = "results", filename: str = "train.log"):
         format="%(asctime)s  %(message)s",
         handlers=[
             logging.StreamHandler(),
-            logging.FileHandler(os.path.join(log_dir, filename), mode="w")
+            logging.FileHandler(os.path.join(log_dir, log_filename), mode="w")
         ]
     )
     return logging.getLogger()
