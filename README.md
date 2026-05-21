@@ -3,6 +3,7 @@ PyTorch implementation of LeNet-5 based on [LeCun et al. (1998)](http://vision.s
 
 ## Model Structure
 ```bash
+Layer                                     Shape                        Params
 c1.weight                                 [6, 1, 5, 5]                    150
 c1.bias                                   [6]                               6
 s2.weight                                 [1, 6, 1, 1]                      6
