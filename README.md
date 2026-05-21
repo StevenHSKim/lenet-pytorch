@@ -1,4 +1,4 @@
-# lenet-pytorch
+# lenet5-pytorch
 PyTorch implementation of LeNet-5 based on [LeCun et al. (1998)](http://vision.stanford.edu/cs598_spring07/papers/Lecun98.pdf).
 
 <img width="1695" height="465" alt="image" src="https://github.com/user-attachments/assets/81d2fd43-2852-4c8e-bf44-b1f88894e766" />
